@@ -62,9 +62,4 @@ npm run start
 yarn lint
 # ou
 npm run lint
-
-# 🧪 Rodar testes (caso existam)
-yarn test
-# ou
-npm run test
 ```
