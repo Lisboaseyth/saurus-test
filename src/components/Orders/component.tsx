@@ -6,8 +6,6 @@ import {
   AlertTitle,
   Box,
   Button,
-  Flex,
-  HStack,
   Icon,
   IconButton,
   Skeleton,
@@ -52,22 +50,17 @@ import {
 import Pagination from "../Pagination";
 import CardOrderComponent from "../Cards/CardOrder";
 import { verifyStatusPayment, verifyTypePayment } from "@/utils/verifyPayments";
-import Input from "../Form/Input";
+import Input from "../FormControl/Input";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { paymentSchema } from "@/schemas/paymentSchema";
-import { useToastCustom } from "@/hooks/useToast/hook";
-import { ToastError } from "@/hooks/useToast/interface";
+import FormPayment from "../Forms/FormPayment";
 
 export default function OrdersComponent({}: OrdersComponentProps) {
-  const [requestPayment, isLoadingPayment] = useFetch<{
-    id: "string";
-  }>();
   const isBreaking = useBreakpointValue({ base: true, md: false });
   const [isPayment, setIsPayment] = React.useState(false);
   const [currentOrder, setCurrentOrder] = React.useState<Order>();
   const toast = useToast();
-  const { toastWithError } = useToastCustom();
   const [filter, setFilter] = React.useState("");
 
   const [requestOrders, isLoadingOrders, orders, pagination] =
@@ -85,14 +78,7 @@ export default function OrdersComponent({}: OrdersComponentProps) {
     count: steps.length,
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-    reset,
-  } = useForm({
+  const { setValue, watch } = useForm({
     resolver: yupResolver(paymentSchema),
   });
 
@@ -125,33 +111,6 @@ export default function OrdersComponent({}: OrdersComponentProps) {
   const handleMethodPayment = (type: string) => {
     setActiveStep(1);
     setValue("paymentType", type);
-  };
-
-  const handlePaymentSubmit = () => {
-    const data = {
-      aplicacaoid: token,
-      username: user.username,
-    };
-    setActiveStep(2);
-    requestPayment("/api/payment", {
-      method: "POST",
-      body: data,
-      params: {
-        username: user.username,
-        aplicacaoid: token,
-      },
-    })
-      .then(() => {
-        toast({
-          title: "Pagamento realizado com sucesso",
-          status: "success",
-        });
-        setActiveStep(3);
-      })
-      .catch((error) => {
-        toastWithError(error as ToastError);
-        setActiveStep(1);
-      });
   };
 
   React.useEffect(() => {
@@ -216,100 +175,11 @@ export default function OrdersComponent({}: OrdersComponentProps) {
           {typePayment && activeStep > 0 ? (
             <Stack minH={40} justifyContent={"center"}>
               {activeStep == 1 && (
-                <Stack as={"form"} onSubmit={handleSubmit(handlePaymentSubmit)}>
-                  <Stack spacing={4}>
-                    <Text
-                      onClick={() => {
-                        setActiveStep(0);
-                        reset();
-                      }}
-                      cursor={"pointer"}
-                      textDecoration="underline"
-                    >
-                      Alterar método
-                    </Text>
-
-                    {typePayment === "pix" ? (
-                      <Input
-                        error={errors?.pixKey}
-                        {...register("pixKey")}
-                        label="Chave Pix"
-                      />
-                    ) : (
-                      <Stack>
-                        <Input
-                          error={errors?.cardName}
-                          {...register("cardName")}
-                          label="Nome no cartão"
-                          type="text"
-                        />
-                        <Input
-                          inputMode="numeric"
-                          pattern="\d*"
-                          maxLength={16}
-                          onInput={(e) => {
-                            e.currentTarget.value =
-                              e.currentTarget.value.replace(/\D/g, "");
-                          }}
-                          error={errors?.cardNumber}
-                          {...register("cardNumber")}
-                          label="Número do cartão"
-                        />
-                        <HStack>
-                          <Stack spacing={1}>
-                            <Text color={"#333333"} fontWeight={500}>
-                              Validade
-                            </Text>
-                            <Flex gap={2}>
-                              <Input
-                                inputMode="numeric"
-                                pattern="\d*"
-                                maxLength={2}
-                                onInput={(e) => {
-                                  e.currentTarget.value =
-                                    e.currentTarget.value.replace(/\D/g, "");
-                                }}
-                                error={errors?.monthNumber}
-                                {...register("monthNumber")}
-                              />
-                              <Input
-                                inputMode="numeric"
-                                pattern="\d*"
-                                maxLength={4}
-                                onInput={(e) => {
-                                  e.currentTarget.value =
-                                    e.currentTarget.value.replace(/\D/g, "");
-                                }}
-                                error={errors?.yearNumber}
-                                {...register("yearNumber")}
-                              />
-                            </Flex>
-                          </Stack>
-                          <Input
-                            inputMode="numeric"
-                            pattern="\d*"
-                            maxLength={3}
-                            onInput={(e) => {
-                              e.currentTarget.value =
-                                e.currentTarget.value.replace(/\D/g, "");
-                            }}
-                            error={errors?.yearNumber}
-                            {...register("cvc")}
-                            label="CVC"
-                          />
-                        </HStack>
-                      </Stack>
-                    )}
-
-                    <Button
-                      isLoading={isLoadingPayment}
-                      type="submit"
-                      variant={"custom"}
-                    >
-                      Pagar
-                    </Button>
-                  </Stack>
-                </Stack>
+                <FormPayment
+                  order={currentOrder}
+                  setActiveStep={setActiveStep}
+                  typePayment={typePayment}
+                />
               )}
               {activeStep == 2 && (
                 <Stack w={"full"}>
