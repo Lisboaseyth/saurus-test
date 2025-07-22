@@ -21,6 +21,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = React.useState<User>({} as User);
   const router = useRouter();
   const toast = useToast();
+  const { token } = parseCookies();
 
   const [requestLogin, isLoadingLogin] = useFetch<LoginAuthenticated>();
 
@@ -74,7 +75,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const validatedToken = () => {
-    const { token } = parseCookies();
     try {
       if (token) {
         setUser({
@@ -83,9 +83,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       } else {
         clearSession();
+        router.push("/");
       }
     } catch {
       clearSession();
+      router.push("/");
       Toast({
         title: "Session expired",
         description: "Please log in again.",
@@ -98,7 +100,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   React.useEffect(() => {
     validatedToken();
-  }, []);
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ login, isLoadingLogin, logout, user }}>
