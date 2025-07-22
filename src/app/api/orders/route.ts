@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const baseUrl = "https://api-pedido-erp-gateway-prod.saurus.net.br";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const baseUrl = "https://api-pedido-erp-gateway-prod.saurus.net.br";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function POST(req: Request) {
   const body = await req.json();
