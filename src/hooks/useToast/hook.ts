@@ -1,8 +1,8 @@
-import { useToast as useToastChakra } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import { ToastError, ToastSettings } from "./interface";
 
-export function useToast() {
-  const toastChakra = useToastChakra();
+export function useToastCustom() {
+  const toastChakra = useToast();
 
   const settingsToast: ToastSettings = {
     position: "top-right",

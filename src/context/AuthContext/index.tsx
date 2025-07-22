@@ -65,6 +65,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     clearSession();
     router.push("/");
+    toast({
+      title: "Usuário deslogado!",
+      status: "success",
+      position: "top-right",
+      duration: 3000,
+    });
   };
 
   const validatedToken = () => {

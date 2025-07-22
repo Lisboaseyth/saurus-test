@@ -15,25 +15,30 @@ export const InputCustom = ({
   label,
   error = null,
   icon,
+  handleIcon,
+  placeholder,
   ...props
 }: InputCustomProps) => {
   return (
     <FormControl isInvalid={!!error}>
-      <FormLabel color={"#333333"} fontSize={"sm"} zIndex="30">
-        {label}
-      </FormLabel>
+      {label && (
+        <FormLabel color={"#333333"} fontSize={"sm"} zIndex="30">
+          {label}
+        </FormLabel>
+      )}
       <InputGroup>
         <Input
+          placeholder={placeholder}
           {...props}
           color={"#333333"}
-          borderColor="#DEE5EE"
+          borderColor="#abf8cbff"
           transition="border 0.2s"
           _hover={{ boxShadow: "none", borderColor: "#DEE5EE" }}
           _focus={{ boxShadow: "none", borderColor: "#DEE5EE" }}
         />
         {icon && (
-          <InputRightElement pointerEvents="none">
-            <Icon as={icon} size={20} color="#718096" />
+          <InputRightElement onClick={handleIcon}>
+            <Icon as={icon} boxSize={5} color="#718096" />
           </InputRightElement>
         )}
       </InputGroup>
