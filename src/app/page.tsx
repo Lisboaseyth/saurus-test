@@ -4,13 +4,12 @@ import Input from "@/components/Form/Input";
 import Select from "@/components/Form/Select";
 import { useAuth } from "@/context/AuthContext";
 import useFetch from "@/hooks/useFetch/hook";
-import { useToast } from "@/hooks/useToast/hook";
+import { useToastCustom } from "@/hooks/useToast/hook";
 import { ToastError } from "@/hooks/useToast/interface";
 import { Application } from "@/interfaces/Application";
 import { loginSchema, LoginSchemaType } from "@/schemas/loginSchema";
 import {
   Button,
-  Skeleton,
   Spinner,
   Stack,
   Text,
@@ -21,6 +20,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { FaRegEye, FaRegEyeSlash } from "@/components/Icons";
 
 export default function Home() {
   const isBreaking = useBreakpointValue({ base: true, md: false });
@@ -28,12 +28,14 @@ export default function Home() {
     useFetch<Array<Application>>();
   const { login, isLoadingLogin } = useAuth();
   const router = useRouter();
-  const { toastWithError } = useToast();
+  const [visible, setVisible] = React.useState(false);
+  const { toastWithError } = useToastCustom();
 
   const {
     register,
     formState: { errors },
     handleSubmit,
+    reset,
   } = useForm({
     resolver: yupResolver(loginSchema),
   });
@@ -49,7 +51,11 @@ export default function Home() {
   React.useEffect(() => {
     requestApplications("/api/applications", {
       method: "GET",
-    });
+    }).then((resp) =>
+      reset({
+        aplicacaoId: resp.data[0].id,
+      })
+    );
   }, []);
 
   return (
@@ -104,7 +110,11 @@ export default function Home() {
             >
               <Select {...register("aplicacaoId")} label="Sistema">
                 {applications?.map((app, index) => (
-                  <option key={index} style={{background: "white"}} value={app.id}>
+                  <option
+                    key={index}
+                    style={{ background: "white" }}
+                    value={app.id}
+                  >
                     {app.nomeReferencia}
                   </option>
                 ))}
@@ -115,8 +125,11 @@ export default function Home() {
                 {...register("usuario")}
               />
               <Input
+                handleIcon={() => setVisible(!visible)}
+                icon={visible ? FaRegEye : FaRegEyeSlash}
                 error={errors.senha}
                 label="Senha"
+                type={visible ? "text" : "password"}
                 {...register("senha")}
               />
               <Button
