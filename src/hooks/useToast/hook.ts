@@ -12,7 +12,6 @@ export function useToast() {
   function toastWithError(error: ToastError) {
     if (error) {
       const message = error?.message;
-      console.log(error.message);
       if (message) {
         return toastChakra({
           title: message,
